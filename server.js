@@ -35,16 +35,17 @@ app.post("/api/compress", upload.single("pdfFile"), async (req, res) => {
 
     // Delay helps ensure file system finishes writing
     setTimeout(() => {
-      res.download(finalOutputPath, "compressed.pdf", (err) => {
-        if (err) {
-          console.error("Download error:", err);
-          res.status(500).send("Failed to send file");
-        } else {
-          // Cleanup (optional)
-          fs.unlink(file.path, () => {});
-          fs.unlink(finalOutputPath, () => {});
-        }
-      });
+      res.sendFile(finalOutputPath, (err) => {
+  if (err) {
+    console.error("Send file error:", err);
+    res.status(500).send("Failed to send file");
+  } else {
+    // Cleanup after sending
+    fs.unlink(file.path, () => {});
+    fs.unlink(finalOutputPath, () => {});
+  }
+});
+
     }, 300);
 
   } catch (err) {
