@@ -1,10 +1,14 @@
 import sys
 import os
 import subprocess
+import platform
 
 def compress_with_ghostscript(input_path, output_path, quality):
+    # Auto-detect Ghostscript command based on OS
+    gs_command = "gswin64c" if platform.system() == "Windows" else "gs"
+
     command = [
-        "gswin64c",  # Change to "gs" if on Linux/macOS
+        gs_command,
         "-sDEVICE=pdfwrite",
         "-dCompatibilityLevel=1.4",
         f"-dPDFSETTINGS=/{quality}",
@@ -14,6 +18,7 @@ def compress_with_ghostscript(input_path, output_path, quality):
         f"-sOutputFile={output_path}",
         input_path
     ]
+
     result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return result.returncode == 0
 
@@ -45,7 +50,7 @@ def compress_pdf_to_target(input_path, output_base, target_kb):
         if os.path.exists(f) and f != final_output:
             os.remove(f)
 
-    print(f"Success: Final size = {final_size} KB")
+    print(f"✅ Success: Final size = {final_size} KB")
     return True, final_size
 
 # ---- ENTRY POINT ----
